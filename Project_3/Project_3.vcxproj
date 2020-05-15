@@ -139,18 +139,23 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="Automaton.h" />
+    <ClInclude Include="Database.h" />
     <ClInclude Include="DatalogProg.h" />
     <ClInclude Include="FSA_Collection.h" />
+    <ClInclude Include="Interpretor.h" />
     <ClInclude Include="Lexer.h" />
     <ClInclude Include="Parameter.h" />
     <ClInclude Include="Parser.h" />
     <ClInclude Include="Predicate.h" />
+    <ClInclude Include="Relation.h" />
     <ClInclude Include="Rule.h" />
     <ClInclude Include="Token.h" />
     <ClInclude Include="TokenTypes.h" />
+    <ClInclude Include="Tuple.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Automaton.cpp" />
+    <ClCompile Include="Interpretor.cpp" />
     <ClCompile Include="Lexer.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Parser.cpp" />

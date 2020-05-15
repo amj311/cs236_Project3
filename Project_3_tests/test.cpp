@@ -1,15 +1,6 @@
 #include "pch.h"
+
 #include "../Project_3/Parser.h"
-
-
-#include <fstream>
-
-string getFile(string path) {
-	ifstream ifs(path);
-	return string((istreambuf_iterator<char>(ifs)),
-		(istreambuf_iterator<char>()));
-}
-
 
 TEST(matchType, SCHEMES_bad) {
 	vector<Token*> tokens = {

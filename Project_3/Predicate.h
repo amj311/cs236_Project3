@@ -19,6 +19,7 @@ public:
 	string id() {
 		return idStr;
 	}
+
 	string toString() {
 		string out = idStr + "(";
 		for (size_t i = 0; i < params.size(); i++) {
