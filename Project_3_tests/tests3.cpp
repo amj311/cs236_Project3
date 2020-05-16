@@ -66,30 +66,73 @@ TEST(Database, constructor) {
 	EXPECT_FALSE(db.hasRelation("test"));
 }
 
+TEST(Database, addRelation) {
+	vector<string> values = { "A", "B", "C" };
+	string name = "schemeABC";
+	Predicate scm(name, values);
+
+	Database db = Database();
+	db.addRelationFromScheme(scm);
+	EXPECT_TRUE(db.hasRelation(scm.id()));
+	EXPECT_EQ(db.getRelation(scm.id()).name(), name);
+}
+
+
+TEST(Database, addRelationTwice) {
+	vector<string> values = { "A", "B", "C" };
+	string name = "schemeABC";
+	Predicate scm(name, values);
+
+	Database db = Database();
+	db.addRelationFromScheme(scm);
+	EXPECT_TRUE(db.hasRelation(scm.id()));
+	db.addRelationFromScheme(scm);
+	EXPECT_EQ(db.size(), 1);
+}
+
+
+TEST(Database, addFacts) {
+	vector<string> params = { "ay", "bee", "sea" };
+	string id = "schemeABC";
+	Predicate fact(id, params);
+
+	vector<string> values = { "A", "B", "C" };
+	string name = "schemeABC";
+	Predicate scm(name, values);
+
+	Database db = Database();
+	EXPECT_FALSE(db.saveFact(fact));
+
+	db.addRelationFromScheme(scm);
+	EXPECT_TRUE(db.saveFact(fact));
+}
+
+
+
 string getFile(string path) {
 	ifstream ifs(path);
 	return string((istreambuf_iterator<char>(ifs)),
 		(istreambuf_iterator<char>()));
 }
 
-//#include "../Project_3/Lexer.h"
-//
-//TEST(parseProgram, testFile) {
-//	string file = getFile("../../Project2/testFile.txt");
-//
-//	Lexer lexer(file);
-//	lexer.tokenizeInput();
-//
-//	Parser parser(lexer.getTokenList());
-//	bool res = parser.run();
-//	EXPECT_TRUE(res);
-//
-//	DatalogProg prog = parser.getParsedProgram();
-//	EXPECT_EQ(prog.schemeList().size(), 2);
-//	EXPECT_EQ(prog.factList().size(), 2);
-//	EXPECT_EQ(prog.ruleList().size(), 2);
-//	EXPECT_EQ(prog.queryList().size(), 2);
-//}
+#include "../Project_3/Lexer.h"
+#include "../Project_3/Parser.h"
+
+TEST(Interpretor, testFile) {
+	string file = getFile("../Project_3/testFile.txt");
+
+	Lexer lexer(file);
+	lexer.tokenizeInput();
+
+	Parser parser(lexer.getTokenList());
+	bool res = parser.run();
+	EXPECT_TRUE(res);
+
+	DatalogProg prog = parser.getParsedProgram();
+	Interpretor interp = Interpretor(prog);
+	Relation snap = interp.getRelation("snap");
+	EXPECT_EQ(snap.size(), 2);
+}
 //
 //
 //

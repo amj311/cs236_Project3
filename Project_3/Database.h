@@ -35,6 +35,10 @@ public:
 		return relations[name];
 	}
 
+	size_t size() {
+		return relations.size();
+	}
+
 private:
 	map<string, Relation> relations;
 };
