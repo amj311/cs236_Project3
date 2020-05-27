@@ -10,7 +10,7 @@ public:
 	Database() {};
 
 	void addRelationFromScheme(Predicate scheme) {
-		relations[scheme.id()] = Relation(scheme);
+		relations[scheme.id()] = Relation(scheme.id(), scheme.getParamValues());
 	}
 
 	bool saveFact(Predicate fact) {

@@ -16,6 +16,17 @@ public:
 	vector<Parameter> getParamList() {
 		return params;
 	}
+
+	vector<string> getParamValues() {
+		vector<string> values;
+
+		for (size_t i = 0; i < params.size(); i++) {
+			values.push_back(params[i].value());
+		}
+
+		return values;
+	}
+
 	string id() {
 		return idStr;
 	}

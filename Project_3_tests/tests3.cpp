@@ -37,8 +37,8 @@ TEST(Relation, constructFromScheme) {
 	string id = "schemeABC";
 	Predicate pred(id, values);
 
-	Relation rel(pred);
-	EXPECT_EQ(rel.attrList()[0], "A");
+	Relation rel(id, values);
+	EXPECT_EQ(rel.getHeader()[0], "A");
 }
 
 TEST(Relation, addTuples) {
@@ -51,9 +51,9 @@ TEST(Relation, addTuples) {
 	Predicate fact(id, params);
 	Tuple tuple(fact.getParamList());
 
-	Relation rel(scm);
+	Relation rel(name, values);
 	rel.insert(tuple);
-	EXPECT_EQ(rel.attrList()[0], "A");
+	EXPECT_EQ(rel.getHeader()[0], "A");
 	
 	EXPECT_EQ(rel.size(), 1);
 	rel.insert(tuple);

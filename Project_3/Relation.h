@@ -2,36 +2,33 @@
 #define REL_H
 
 #include "Tuple.h"
-#include "Predicate.h"
+#include "Header.h"
 #include <set>
 using namespace std;
 
-class Relation : public set<vector<string>>
+class Relation : public set<Tuple>
 {
 public:
 	Relation() {};
-	Relation(Predicate scheme) :
-		scheme(scheme),
-		nameStr(scheme.id())
+	Relation(string name, vector<string> headStrings) :
+		nameStr(name)
 	{
-		vector<Parameter> params = scheme.getParamList();
-		for (size_t i = 0; i < params.size(); i++) {
-			attributes.push_back(params[i].value());
+		for (size_t i = 0; i < headStrings.size(); i++) {
+			header.push_back(headStrings[i]);
 		}
 	};
-
 	string name() {
 		return nameStr;
 	}
-
-	vector<string> attrList() {
-		return attributes;
+	Header getHeader() {
+		return header;
 	}
 
+
+
 private:
-	Predicate scheme;
 	string nameStr;
-	vector<string> attributes;
+	Header header;
 };
 
 #endif
