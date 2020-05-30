@@ -4,7 +4,7 @@
 #include <string>
 using namespace std;
 
-class Parameter
+class Parameter : public string
 {
 public:
 	Parameter(string value) : valueStr(value) {

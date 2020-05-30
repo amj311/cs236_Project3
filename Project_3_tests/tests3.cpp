@@ -38,7 +38,7 @@ TEST(Relation, constructFromScheme) {
 	Predicate pred(id, values);
 
 	Relation rel(id, values);
-	EXPECT_EQ(rel.getHeader()[0], "A");
+	EXPECT_EQ(rel.getHeader().scheme[0], "A");
 }
 
 TEST(Relation, addTuples) {
@@ -53,12 +53,114 @@ TEST(Relation, addTuples) {
 
 	Relation rel(name, values);
 	rel.insert(tuple);
-	EXPECT_EQ(rel.getHeader()[0], "A");
+	EXPECT_EQ(rel.getHeader().scheme[0], "A");
 	
 	EXPECT_EQ(rel.size(), 1);
 	rel.insert(tuple);
 	EXPECT_EQ(rel.size(), 1);
 }
+
+
+TEST(Relation, select) {
+	vector<string> values = { "A", "B", "C" };
+	string name = "schemeABC";
+	Predicate scm(name, values);
+
+	vector<string> params = { "ay", "bee", "sea" };
+	string id = "schemeABC";
+	Predicate fact(id, params);
+	Tuple tuple(fact.getParamList());
+
+	Relation rel(name, values);
+	rel.insert(tuple);
+
+	Relation res = rel.select(1, "bee");
+
+	EXPECT_EQ((*res.begin()), params);
+}
+
+TEST(Relation, project) {
+	vector<string> colNames = { "A", "B", "C" };
+	string name = "schemeABC";
+	Predicate scm(name, colNames);
+
+	vector<string> params = { "ay", "bee", "sea" };
+	Predicate fact(name, params);
+	Tuple tuple(fact.getParamList());
+
+	vector<string> params2 = { "zero", "one", "two" };
+	Predicate fact2(name, params2);
+	Tuple tuple2(fact2.getParamList());
+
+	Relation rel(name, colNames);
+	rel.insert(tuple);
+	rel.insert(tuple2);
+
+	vector<size_t> cols = { 2, 0 };
+	Relation res = rel.project(cols);
+
+	EXPECT_EQ(res.size(), 2);
+	EXPECT_EQ(res.getHeader().scheme[0], "C");
+	EXPECT_EQ((*res.begin())[1], "ay");
+}
+
+TEST(Relation, rename) {
+	vector<string> colNames = { "A", "B", "C" };
+	string name = "schemeABC";
+	Predicate scm(name, colNames);
+
+	vector<string> params = { "ay", "bee", "sea" };
+	Predicate fact(name, params);
+	Tuple tuple(fact.getParamList());
+
+	Relation rel(name, colNames);
+	rel.insert(tuple);
+
+	Relation res = rel.rename(1, "BEE");
+
+	EXPECT_EQ(res.size(), rel.size());
+	EXPECT_EQ(rel.getHeader().scheme[1], "B");
+	EXPECT_EQ(res.getHeader().scheme[1], "BEE");
+}
+
+
+
+
+
+
+
+
+
+
+TEST(Relation, selectIfEqual) {
+	vector<string> colNames = { "A", "B", "C" };
+	string name = "schemeABC";
+	Predicate scm(name, colNames);
+
+	vector<string> params = { "ay", "ay", "ay" };
+	Predicate fact(name, params);
+	Tuple tuple(fact.getParamList());
+
+	vector<string> params2 = { "ay", "bee", "ay" };
+	Predicate fact2(name, params2);
+	Tuple tuple2(fact2.getParamList());
+
+	Relation rel(name, colNames);
+	rel.insert(tuple);
+	rel.insert(tuple2);
+
+	vector<size_t> cols = { 1, 2 };
+	Relation res = rel.selectIfEqual(cols);
+
+	EXPECT_EQ(res.size(), 1);
+}
+
+
+
+
+
+
+
 
 
 TEST(Database, constructor) {
@@ -120,18 +222,24 @@ string getFile(string path) {
 
 TEST(Interpretor, testFile) {
 	string file = getFile("../Project_3/testFile.txt");
+	//cout << file << endl;
 
 	Lexer lexer(file);
 	lexer.tokenizeInput();
 
 	Parser parser(lexer.getTokenList());
-	bool res = parser.run();
-	EXPECT_TRUE(res);
 
+	parser.parseProgram();
 	DatalogProg prog = parser.getParsedProgram();
-	Interpretor interp = Interpretor(prog);
-	Relation snap = interp.getRelation("snap");
-	EXPECT_EQ(snap.size(), 2);
+
+	Interpretor interp = Interpretor();
+	interp.interpretProgram(prog);
+
+	//Relation res = interp.relFromQuery(0);
+	//EXPECT_EQ(res.size(), 1);
+	//
+	//res = interp.relFromQuery(1);
+	//EXPECT_EQ(res.size(), 2);
 }
 //
 //

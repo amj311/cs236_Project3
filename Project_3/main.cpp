@@ -6,6 +6,7 @@ using namespace std;
 #include "Lexer.h"
 #include "Parser.h"
 #include "DatalogProg.h"
+#include "Interpretor.h"
 
 int main(int argc, char** argv)
 {
@@ -20,6 +21,9 @@ int main(int argc, char** argv)
     parser.run();
 
     DatalogProg prog = parser.getParsedProgram();
+
+    Interpretor interp = Interpretor();
+    interp.interpretProgram(prog);
 
     return 0;
 }

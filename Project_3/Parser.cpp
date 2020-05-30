@@ -58,8 +58,8 @@ bool Parser::parseProgram() {
 
 	prog.setReady();
 
-	printSuccess();
-	cout << prog.toString();
+	//printSuccess();
+	//cout << prog.toString();
 	return true;
 }
 
