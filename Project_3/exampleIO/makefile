@@ -1,5 +1,5 @@
-NUM?=3
-numbers=30 33 35 36 37 41 42 43 44 61 62
+NUM?=4
+numbers=40 44 45 46 47 48 49 54 55 61 62
 tests=exampleIO
 
 run:

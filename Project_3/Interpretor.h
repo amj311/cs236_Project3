@@ -22,20 +22,65 @@ public:
 		for (size_t i = 0; i < schemes.size(); i++) {
 			db.addRelationFromScheme(schemes[i]);
 		}
-		// creat tuples for schemes, add to relation in database
+
+		// create tuples for schemes, add to relation in database
 		vector<Predicate> facts = prog.factList();
 		for (size_t i = 0; i < facts.size(); i++) {
 			db.saveFact(facts[i]);
 		}
+
+		rules = prog.ruleList();
 		queries = prog.queryList();
 	}
 
 	void interpretLoaded() {
+		interpretRules();
+
+		cout << "Query Evaluation" << endl;
 		for (size_t i = 0; i < queries.size(); i++) {
-			evalQuery(queries[i]);
+			evalPred(queries[i], true);
 		}
 	}
 
+	void interpretRules() {
+		cout << "Rule Evaluation" << endl;
+		int rulePasses = 0;
+		bool addedTuples;
+		string out;
+		do {
+			addedTuples = false;
+			out = "";
+
+			for (size_t i = 0; i < rules.size(); i++) {
+				cout << rules[i].toString() << "\n";
+				Relation* dbRel = db.getRelationPtr(rules[i].head().id());
+				vector<Predicate> preds = rules[i].getPredList();
+
+				Relation ruleRelation = evalPred(preds[0]);
+				
+				for (size_t j = 0; j < preds.size(); j++) {
+					ruleRelation = ruleRelation.join(evalPred(preds[j]));
+				}
+
+				vector<string> headScheme = rules[i].head().getParamValues();
+				vector<size_t> projCols;
+				for (size_t i = 0; i < headScheme.size(); i++) {
+					for (size_t j = 0; j < ruleRelation.getHeader().scheme.size(); j++) {
+						if (ruleRelation.getHeader().scheme[j] == headScheme[i]) {
+							projCols.push_back(j);
+							ruleRelation = ruleRelation.rename(j, (*dbRel).getHeader().scheme[i]);
+						}
+					}
+				}
+				ruleRelation = ruleRelation.project(projCols);
+				if ((*dbRel).addFrom(ruleRelation)) addedTuples = true;
+			}
+
+			rulePasses++;
+		} while (addedTuples);
+
+		cout << endl << "Schemes populated after " << rulePasses << " passes through the Rules." << endl << endl;
+	}
 
 	Relation getRelation(string name) {
 		if (db.hasRelation(name)) {
@@ -45,15 +90,16 @@ public:
 	}
 
 	Relation relFromQuery(size_t pos) {
-		return evalQuery(queries[pos]);
+		return evalPred(queries[pos]);
 	}
 
 private:
 	Database db = Database();
+	vector<Rule> rules;
 	vector<Predicate> queries;
 
-	Relation evalQuery(Predicate query) {
-		cout << query.toString() << "? ";
+	Relation evalPred(Predicate query, bool print = false) {
+		if (print) cout << query.toString() << "? ";
 
 		vector<Parameter> params = query.getParamList();
 		Relation initRel = getRelation(query.id());
@@ -114,22 +160,23 @@ private:
 
 
 
-
-		// PRINT RESULTS
-		if (finalRel.size() > 0) {
-			cout << "Yes(" << finalRel.size() << ")" << endl;
-			if (varCols.size() > 0) {
-				for (Relation::iterator it = finalRel.begin(); it != finalRel.end(); it++) {
-					cout << "  ";
-					for (size_t h = 0; h < finalRel.getHeader().scheme.size(); h++) {
-						cout << finalRel.getHeader().scheme[h] << "=" << (*it)[h];
-						if (h < finalRel.getHeader().scheme.size() - 1) cout << ", ";
+		if (print) {
+			// PRINT RESULTS
+			if (finalRel.size() > 0) {
+				cout << "Yes(" << finalRel.size() << ")" << endl;
+				if (varCols.size() > 0) {
+					for (Relation::iterator it = finalRel.begin(); it != finalRel.end(); it++) {
+						cout << "  ";
+						for (size_t h = 0; h < finalRel.getHeader().scheme.size(); h++) {
+							cout << finalRel.getHeader().scheme[h] << "=" << (*it)[h];
+							if (h < finalRel.getHeader().scheme.size() - 1) cout << ", ";
+						}
+						cout << endl;
 					}
-					cout << endl;
 				}
 			}
+			else cout << "No" << endl;
 		}
-		else cout << "No" << endl;
 
 		return finalRel;
 	}

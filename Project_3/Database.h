@@ -35,6 +35,10 @@ public:
 		return relations[name];
 	}
 
+	Relation* getRelationPtr(string name) {
+		return &relations[name];
+	}
+
 	size_t size() {
 		return relations.size();
 	}
