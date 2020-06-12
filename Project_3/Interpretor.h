@@ -3,6 +3,7 @@
 
 #include "DatalogProg.h"
 #include "Database.h"
+#include "Graph.h"
 #include <algorithm>
 
 class Interpretor
@@ -34,7 +35,21 @@ public:
 	}
 
 	void interpretLoaded() {
-		interpretRules();
+		RulesGraph graph = RulesGraph();
+		for (size_t i = 0; i < rules.size(); i++) {
+			graph.addRule(rules[i]);
+		}
+		vector<vector<size_t>> sccs = graph.findSCC();
+		for (size_t i = 0; i < sccs.size(); i++) {
+			vector<Rule> sccRules = {};
+			for (size_t j = 0; j < sccs[i].size(); j++) {
+				sccRules.push_back(rules[sccs[i][j]]);
+			}
+
+			interpretRules(sccRules);
+		}
+
+		interpretRules(rules);
 
 		cout << "Query Evaluation" << endl;
 		for (size_t i = 0; i < queries.size(); i++) {
@@ -42,7 +57,7 @@ public:
 		}
 	}
 
-	void interpretRules() {
+	void interpretRules(vector<Rule> ruleList) {
 		cout << "Rule Evaluation" << endl;
 		int rulePasses = 0;
 		bool addedTuples;
@@ -51,10 +66,10 @@ public:
 			addedTuples = false;
 			out = "";
 
-			for (size_t i = 0; i < rules.size(); i++) {
-				cout << rules[i].toString() << "\n";
-				Relation* dbRel = db.getRelationPtr(rules[i].head().id());
-				vector<Predicate> preds = rules[i].getPredList();
+			for (size_t i = 0; i < ruleList.size(); i++) {
+				cout << ruleList[i].toString() << "\n";
+				Relation* dbRel = db.getRelationPtr(ruleList[i].head().id());
+				vector<Predicate> preds = ruleList[i].getPredList();
 
 				Relation ruleRelation = evalPred(preds[0]);
 				
@@ -62,7 +77,7 @@ public:
 					ruleRelation = ruleRelation.join(evalPred(preds[j]));
 				}
 
-				vector<string> headScheme = rules[i].head().getParamValues();
+				vector<string> headScheme = ruleList[i].head().getParamValues();
 				vector<size_t> projCols;
 				for (size_t i = 0; i < headScheme.size(); i++) {
 					for (size_t j = 0; j < ruleRelation.getHeader().scheme.size(); j++) {

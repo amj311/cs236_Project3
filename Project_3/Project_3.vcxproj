@@ -142,6 +142,7 @@
     <ClInclude Include="Database.h" />
     <ClInclude Include="DatalogProg.h" />
     <ClInclude Include="FSA_Collection.h" />
+    <ClInclude Include="Graph.h" />
     <ClInclude Include="Header.h" />
     <ClInclude Include="Interpretor.h" />
     <ClInclude Include="Lexer.h" />
