@@ -170,29 +170,49 @@ TEST(RulesGraph, graph_ls_example) {
 	EXPECT_EQ(postorder, correctOrder);
 }
 
-TEST(RulesGraph, ls_example_scc) {
+TEST(RulesGraph, bob_scc) {
 	vector<Predicate> preds_B = { predB };
-	Rule ruleA_B(predA, preds_B);
-
-	vector<Predicate> preds_A = { predA };
-	Rule ruleB_A(predB, preds_A);
-
 	Rule ruleB_B(predB, preds_B);
 
 	vector<Predicate> preds_D = { predD };
-	Rule ruleE_D(predE, preds_D);
+	Rule ruleB_D(predB, preds_D);
 
-	vector<Predicate> preds_E = { predE };
-	Rule ruleE_E(predE, preds_E);
+	Rule ruleD_B(predD, preds_B);
 
 	RulesGraph graph = RulesGraph();
-	graph.addRule(ruleA_B);
-	graph.addRule(ruleB_A);
 	graph.addRule(ruleB_B);
-	graph.addRule(ruleE_D);
-	graph.addRule(ruleE_E);
+	graph.addRule(ruleB_D);
+	graph.addRule(ruleD_B);
 	vector<vector<size_t>> sccs = graph.findSCC();
-	
-	vector<vector<size_t>> correctSccs = { {3}, {4}, {2, 1, 0} };
+
+	vector<vector<size_t>> correctSccs = { {0, 1, 2} };
 	EXPECT_EQ(sccs, correctSccs);
+}
+
+
+
+
+string getFile(string path) {
+	ifstream ifs(path);
+	return string((istreambuf_iterator<char>(ifs)),
+		(istreambuf_iterator<char>()));
+}
+
+#include "../Project_3/Lexer.h"
+#include "../Project_3/Parser.h"
+
+TEST(Interpretor, testFile) {
+	string file = getFile("../Project_3/testFile.txt");
+	//cout << file << endl;
+
+	Lexer lexer(file);
+	lexer.tokenizeInput();
+
+	Parser parser(lexer.getTokenList());
+
+	parser.parseProgram();
+	DatalogProg prog = parser.getParsedProgram();
+
+	Interpretor interp = Interpretor();
+	interp.interpretProgram(prog);
 }

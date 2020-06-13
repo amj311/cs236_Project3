@@ -1,15 +1,21 @@
+
+
 Schemes:
-  SK(A,B)
+bob(x)
+jim(x)
+joe(x)
+
 Facts:
-  SK('a','c').
-  SK('b','c').
-  SK('b','b').
-  SK('b','c').
+joe('4').
+jim('2').
+bob('1').
+
 Rules:
+bob(x) :- bob(x).
+bob(x) :- jim(x).
+jim(x) :- bob(x).
 
 Queries:
-  SK(A,'c')?
-  SK('b','c')?
-  SK(X,X)?
-  SK(A,B)?
-  SK('c','c')?
+bob(x)?
+
+

@@ -1,5 +1,5 @@
-NUM?=4
-numbers=40 44 45 46 47 58 49 54 55 61 62
+NUM?=5
+numbers=50 54 55 56 58 59 61 62 64
 tests=project5-exampleIO
 
 run:

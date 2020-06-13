@@ -40,25 +40,42 @@ public:
 			graph.addRule(rules[i]);
 		}
 		vector<vector<size_t>> sccs = graph.findSCC();
+		
+		cout << "Dependency Graph" << endl;
+		graph.print();
+
+		cout << "Rule Evaluation" << endl;
 		for (size_t i = 0; i < sccs.size(); i++) {
+			cout << "SCC: ";
 			vector<Rule> sccRules = {};
+			string nodesStr = "";
 			for (size_t j = 0; j < sccs[i].size(); j++) {
+				nodesStr += "R" + to_string(sccs[i][j]);
+				if (j < sccs[i].size() - 1) nodesStr += ",";
+
 				sccRules.push_back(rules[sccs[i][j]]);
 			}
-
-			interpretRules(sccRules);
+			cout << nodesStr << endl;
+			int passes = interpretRules(sccRules);
+			cout << passes << " passes: " << nodesStr << endl;
 		}
 
-		interpretRules(rules);
-
-		cout << "Query Evaluation" << endl;
+		cout << "\nQuery Evaluation" << endl;
 		for (size_t i = 0; i < queries.size(); i++) {
 			evalPred(queries[i], true);
 		}
 	}
 
-	void interpretRules(vector<Rule> ruleList) {
-		cout << "Rule Evaluation" << endl;
+	int interpretRules(vector<Rule> ruleList) {
+		bool singleNotSelf = false;
+		if (ruleList.size() == 1) {
+			singleNotSelf = true;
+			vector<Predicate> preds = ruleList[0].getPredList();
+			for (size_t i = 0; i < preds.size(); i++) {
+				if (preds[i].id() == ruleList[0].head().id()) singleNotSelf = false;
+			}
+		}
+		
 		int rulePasses = 0;
 		bool addedTuples;
 		string out;
@@ -92,9 +109,9 @@ public:
 			}
 
 			rulePasses++;
-		} while (addedTuples);
+		} while (addedTuples && !singleNotSelf);
 
-		cout << endl << "Schemes populated after " << rulePasses << " passes through the Rules." << endl << endl;
+		return rulePasses;
 	}
 
 	Relation getRelation(string name) {

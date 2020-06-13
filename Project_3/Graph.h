@@ -23,9 +23,12 @@ public:
 			for (size_t j = 0; j < preds.size(); j++) {
 				string predID = preds[j].id();
 				for (size_t k = 0; k < rulesInOrder.size(); k++) {
-					if (rulesInOrder[k].head().id() == predID) nbrs.push_back(k);
+
+					vector<size_t>::iterator it = find(nbrs.begin(), nbrs.end(), k);
+					if (it == nbrs.end() && rulesInOrder[k].head().id() == predID) nbrs.push_back(k);
 				}
 			}
+			sort(nbrs.begin(), nbrs.end());
 			adjacencyList.push_back(nbrs);
 		}
 	}
@@ -53,7 +56,6 @@ public:
 	vector<vector<size_t>> findSCC() {
 		genAdjacency();
 		genReverseGraph();
-		print();
 		vector<size_t> postorder = dfsOfReverseGraph();
 		
 		vector<vector<size_t>> sccs = {};
@@ -61,6 +63,7 @@ public:
 
 		for (size_t i = postorder.size(); i > 0; i--) {
 			vector<size_t> scc = sccOfNode(adjacencyList, postorder[i-1], marked);
+			sort(scc.begin(), scc.end());
 			if (scc.size() > 0) sccs.push_back(scc);
 		}
 
@@ -78,10 +81,12 @@ public:
 		for (size_t i = 0; i < adjacencyList.size(); i++) {
 			cout << "R" << i << ":";
 			for (size_t j = 0; j < adjacencyList[i].size(); j++) {
-				cout << " " << adjacencyList[i][j];
+				cout << "R" << adjacencyList[i][j];
+				if (j < adjacencyList[i].size() - 1) cout << ",";
 			}
 			cout << endl;
 		}
+		cout << endl;
 	}
 
 	void printReverse() {
@@ -119,9 +124,6 @@ private:
 		for (size_t i = 0; i < graph.size(); i++) {
 			dfsOfNode(graph, i, preorder, postorder);
 		}
-
-		cout << "Preorder:" << vectorToString(preorder) << endl;
-		cout << "Postorder:" << vectorToString(postorder) << endl;
 
 		return postorder;
 	}

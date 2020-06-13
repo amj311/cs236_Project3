@@ -216,34 +216,3 @@ TEST(Relation, union_twice) {
 	EXPECT_EQ(rel1.size(), 2);
 }
 
-
-string getFile(string path) {
-	ifstream ifs(path);
-	return string((istreambuf_iterator<char>(ifs)),
-		(istreambuf_iterator<char>()));
-}
-
-#include "../Project_3/Lexer.h"
-#include "../Project_3/Parser.h"
-
-TEST(Interpretor, testFile) {
-	string file = getFile("../Project_3/testFile.txt");
-	//cout << file << endl;
-
-	Lexer lexer(file);
-	lexer.tokenizeInput();
-
-	Parser parser(lexer.getTokenList());
-
-	parser.parseProgram();
-	DatalogProg prog = parser.getParsedProgram();
-
-	Interpretor interp = Interpretor();
-	interp.interpretProgram(prog);
-
-	//Relation res = interp.relFromQuery(0);
-	//EXPECT_EQ(res.size(), 1);
-	//
-	//res = interp.relFromQuery(1);
-	//EXPECT_EQ(res.size(), 2);
-}
